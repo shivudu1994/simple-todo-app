@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @Entity
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "mitigant_todo_app")
 public class TodoTaskItems {
 
@@ -26,12 +27,8 @@ public class TodoTaskItems {
     @CreationTimestamp
     private LocalDateTime createdDateTime;
 
-    @CreationTimestamp
     private LocalDateTime dueDateTime;
     @CreationTimestamp
     private LocalDateTime doneDateTime;
 
-    public TodoTaskItems(){
-        this.status = TodoItemStatus.valueOf("NOT_DONE");
-    }
 }

@@ -2,7 +2,6 @@ package com.mitigant.simpletodobackend.model;
 
 import com.mitigant.simpletodobackend.enums.TodoItemStatus;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,7 +24,6 @@ public class TodoTaskItems {
     private int id;
     @Column(nullable = false)
     private String description;
-
     private TodoItemStatus status;
     @CreationTimestamp
     private LocalDateTime createdDateTime;

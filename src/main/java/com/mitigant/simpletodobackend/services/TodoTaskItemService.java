@@ -11,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @Component
@@ -24,7 +26,7 @@ public class TodoTaskItemService {
         this.todoItemRepository = todoItemRepository;
     }
 
-    
+
     public TodoTaskItems createTodoTaskItem(TodoTaskItemDto todoTaskItemDto) {
         TodoTaskItems todoTaskItems = new TodoTaskItems();
         todoTaskItems.setDescription(todoTaskItemDto.description);
@@ -40,12 +42,10 @@ public class TodoTaskItemService {
         } catch (TodoItemNotFoundException e) {
             throw new RuntimeException(e);
         }
-        if(todoTaskItemDto.description != null){
+        if (todoTaskItemDto.description != null) {
             todoItem.setDescription(todoTaskItemDto.description);
             logger.info("Description has been updated !! ");
-        }
-
-        else{
+        } else {
             logger.error("Description should not be empty");
         }
 
@@ -53,25 +53,58 @@ public class TodoTaskItemService {
 
     }
 
-    public void updateItemStatusAsDone(Long id){
-        try{
+    public void updateItemStatusAsDone(Long id) {
+        try {
             todoItemRepository.findById(id).ifPresent(toDoItem -> {
-                if(toDoItem.getStatus() != TodoItemStatus.PAST_DUE) {
-                    toDoItem.setStatus(TodoItemStatus.DONE);
-                    toDoItem.setDoneDateTime(LocalDateTime.now());
-                    todoItemRepository.save(toDoItem);
-                    logger.info("Updated the Item status to done");
+                        if (toDoItem.getStatus() != TodoItemStatus.PAST_DUE) {
+                            toDoItem.setStatus(TodoItemStatus.DONE);
+                            toDoItem.setDoneDateTime(LocalDateTime.now());
+                            todoItemRepository.save(toDoItem);
+                            logger.info("Updated the Item status to done");
 
-                }
-                else {
-                    logger.error("Cannot Update Todos with Status Past Due");
-                    throw new RuntimeException("Cannot Update Todos with Status Past Due");
-                }
-            }
+                        } else {
+                            throw new RuntimeException("Cannot Update Todos with Status Past Due");
+                        }
+                    }
             );
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void updateStatusNotDone(Long id) {
+        try {
+            todoItemRepository.findById(id).ifPresent(user -> {
+                if (user.getStatus() != TodoItemStatus.PAST_DUE) {
+                    user.setStatus(TodoItemStatus.NOT_DONE);
+                    todoItemRepository.save(user);
+                    logger.info("Updated the Item status to not done");
+                } else {
+                    throw new RuntimeException("Cannot Update Todos with Status Past Due");
+                }
+            });
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<TodoTaskItems> getAllNotdone() {
+        try {
+            logger.info("fetched all the item where the status is not done");
+            return todoItemRepository.findAllByStatus(TodoItemStatus.NOT_DONE);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public TodoTaskItems findById(Long id) {
+        Optional<TodoTaskItems> toDoItemoptional = todoItemRepository.findById(id);
+        if (toDoItemoptional.isPresent()) {
+            return toDoItemoptional.get();
+        } else {
+            throw new RuntimeException("Nothing Found");
+        }
+
     }
 }

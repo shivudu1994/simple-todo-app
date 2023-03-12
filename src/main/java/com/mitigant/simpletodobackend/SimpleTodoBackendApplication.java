@@ -31,7 +31,7 @@ public class SimpleTodoBackendApplication {
 			LocalDateTime datetime = LocalDateTime.now();
 			todoItemRepository.save(new TodoTaskItems(1,"Task1",TodoItemStatus.NOT_DONE, null,datetime.plusDays(2) ,null));
 			todoItemRepository.save(new TodoTaskItems(2,"task2",TodoItemStatus.NOT_DONE, null,datetime.plusDays(2),null));
-			todoItemRepository.save(new TodoTaskItems(3,"task3",TodoItemStatus.NOT_DONE, null,datetime.plusDays(2),null));
+			todoItemRepository.save(new TodoTaskItems(3,"task3",TodoItemStatus.DONE, null,datetime.plusDays(2),null));
 			todoItemRepository.save(new TodoTaskItems(4,"task4",TodoItemStatus.PAST_DUE, null,datetime.plusDays(2),null));
 
 		};

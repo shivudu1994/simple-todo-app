@@ -24,7 +24,8 @@ public class TodoTaskItemService {
         this.todoItemRepository = todoItemRepository;
     }
 
-    public TodoTaskItems create(TodoTaskItemDto todoTaskItemDto) {
+    
+    public TodoTaskItems createTodoTaskItem(TodoTaskItemDto todoTaskItemDto) {
         TodoTaskItems todoTaskItems = new TodoTaskItems();
         todoTaskItems.setDescription(todoTaskItemDto.description);
         todoTaskItems.setStatus(TodoItemStatus.NOT_DONE);
@@ -39,15 +40,38 @@ public class TodoTaskItemService {
         } catch (TodoItemNotFoundException e) {
             throw new RuntimeException(e);
         }
-        if(todoTaskItemDto.description != null)
+        if(todoTaskItemDto.description != null){
             todoItem.setDescription(todoTaskItemDto.description);
+            logger.info("Description has been updated !! ");
+        }
+
         else{
             logger.error("Description should not be empty");
         }
 
-        if(todoTaskItemDto.dueDateTime != null)
-            todoItem.setDueDateTime(LocalDateTime.parse(todoTaskItemDto.dueDateTime));
-
         return todoItemRepository.save(todoItem);
+
+    }
+
+    public void updateItemStatusAsDone(Long id){
+        try{
+            todoItemRepository.findById(id).ifPresent(toDoItem -> {
+                if(toDoItem.getStatus() != TodoItemStatus.PAST_DUE) {
+                    toDoItem.setStatus(TodoItemStatus.DONE);
+                    toDoItem.setDoneDateTime(LocalDateTime.now());
+                    todoItemRepository.save(toDoItem);
+                    logger.info("Updated the Item status to done");
+
+                }
+                else {
+                    logger.error("Cannot Update Todos with Status Past Due");
+                    throw new RuntimeException("Cannot Update Todos with Status Past Due");
+                }
+            }
+            );
+        }
+        catch (Exception e){
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -1,7 +1,6 @@
 package com.mitigant.simpletodobackend.controllers;
 
 import com.mitigant.simpletodobackend.dto.TodoTaskItemDto;
-import com.mitigant.simpletodobackend.model.TodoTaskItems;
 import com.mitigant.simpletodobackend.services.TodoTaskItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,22 +18,38 @@ public class TodoItemController {
         this.todoTaskItemService = todoTaskItemService;
     }
 
-    @PostMapping(path = "create-item")
-    public TodoTaskItems createItems(@RequestBody TodoTaskItemDto todoTaskItemDto){
-        return todoTaskItemService.create(todoTaskItemDto);
+    @PostMapping(path = "/create-item")
+    public ResponseEntity createItems(@RequestBody TodoTaskItemDto todoTaskItemDto){
+        return new ResponseEntity(todoTaskItemService.createTodoTaskItem(todoTaskItemDto), HttpStatus.OK);
     }
 
     @PatchMapping("/{id}/description")
     public ResponseEntity updateDescription(@PathVariable Long id, @RequestBody TodoTaskItemDto todoTaskItemDto) {
         try{
-            todoTaskItemService.updateDescription(id,todoTaskItemDto);
+            if(!todoTaskItemDto.description.isEmpty()){
+                todoTaskItemService.updateDescription(id,todoTaskItemDto);
+            }
+            else {
+                return new ResponseEntity("Description Should not be empty", HttpStatus.BAD_REQUEST);
+            }
 
         }
         catch (Exception e){
             return new ResponseEntity("Error Updating the Status", HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity("Description updated Successfully!!!", HttpStatus.OK);
-        //return service.updateDescription(id, description);
+    }
+
+    @PutMapping("/updateDoneStatus/{id}")
+    public ResponseEntity updateItemStatusAsDone(@PathVariable Long id) {
+        try{
+            todoTaskItemService.updateItemStatusAsDone(id);
+        }
+        catch (Exception e){
+            return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+
+        }
+        return new ResponseEntity("successfully set status to DONE!!!", HttpStatus.OK);
     }
 
 }

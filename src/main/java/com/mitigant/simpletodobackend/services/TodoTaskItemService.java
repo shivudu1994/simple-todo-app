@@ -28,11 +28,19 @@ public class TodoTaskItemService {
 
 
     public TodoTaskItems createTodoTaskItem(TodoTaskItemDto todoTaskItemDto) {
-        TodoTaskItems todoTaskItems = new TodoTaskItems();
-        todoTaskItems.setDescription(todoTaskItemDto.description);
-        todoTaskItems.setStatus(TodoItemStatus.NOT_DONE);
-        todoTaskItems.setDueDateTime(LocalDateTime.parse(todoTaskItemDto.dueDateTime));
-        return todoItemRepository.save(todoTaskItems);
+
+        try {
+            TodoTaskItems todoTaskItems = new TodoTaskItems();
+            todoTaskItems.setDescription(todoTaskItemDto.description);
+            todoTaskItems.setStatus(TodoItemStatus.NOT_DONE);
+            todoTaskItems.setDueDateTime(LocalDateTime.parse(todoTaskItemDto.dueDateTime));
+            logger.info("Todo Task Item has been created !!! ");
+            return todoItemRepository.save(todoTaskItems);
+        }
+        catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     public TodoTaskItems updateDescription(Long id, TodoTaskItemDto todoTaskItemDto) {
@@ -45,8 +53,6 @@ public class TodoTaskItemService {
         if (todoTaskItemDto.description != null) {
             todoItem.setDescription(todoTaskItemDto.description);
             logger.info("Description has been updated !! ");
-        } else {
-            logger.error("Description should not be empty");
         }
 
         return todoItemRepository.save(todoItem);

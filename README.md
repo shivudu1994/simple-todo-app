@@ -5,8 +5,10 @@
 
 This is a RESTful web service that provides functionalities to manage to-do items.
 
-Overall backend architecture as described below.
+Overall backend workflow as described below.
+Reference : https://techwithmaddy.com/spring-boot-architecture
 ![alt text](architecture.png "Title")
+
 
 ## **Assumptions**
 
@@ -57,6 +59,7 @@ The service assumes that:
    ```
    docker run -p 8080:8080 simple-todo-backend
    ```
+   
 
 ### **Without Docker**
 

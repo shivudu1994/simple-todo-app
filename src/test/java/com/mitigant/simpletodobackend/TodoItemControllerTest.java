@@ -13,6 +13,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -32,14 +33,14 @@ public class TodoItemControllerTest {
     @Autowired
     private TestRestTemplate testRestTemplate;
     @Test
-    public void testPostCreateTodoItem() throws URISyntaxException {
-        final String baseUrl = "http://localhost:"+port+"/v1/api/todo-items/create-item";
+    public void testPostCreateTodoItemValid() throws URISyntaxException {
+        final String baseUrl = "http://localhost:"+port+"/v1/api/todo-items/create-todo-item";
         URI uri = new URI(baseUrl);
 
         RestTemplate restTemplate = new RestTemplate();
         String requestJson = "{\n" +
                 "  \"description\": \"shiva\",\n" +
-                "  \"dueDateTime\": \"2023-03-12T10:19\"\n" +
+                "  \"dueDateTime\": \"2023-03-20T10:19\"\n" +
                 "}";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -48,6 +49,53 @@ public class TodoItemControllerTest {
         ResponseEntity<String> result = restTemplate.postForEntity(uri, toDoItemEntity, String.class);
         Assertions.assertEquals(200, result.getStatusCodeValue());
 
+    }
+
+    @Test
+    public void testPostCreateTodoItemInvalidDescription() throws URISyntaxException {
+        final String baseUrl = "http://localhost:"+port+"/v1/api/todo-items/create-todo-item";
+        URI uri = new URI(baseUrl);
+
+        RestTemplate restTemplate = new RestTemplate();
+        String requestJson = "{\n" +
+                "  \"description\": \"\",\n" +
+                "  \"dueDateTime\": \"2023-03-11T10:19\"\n" + // update date to a future date
+                "}";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<String> toDoItemEntity = new HttpEntity<String>(requestJson,headers);
+
+        try {
+            ResponseEntity<String> result = restTemplate.postForEntity(uri, toDoItemEntity, String.class);
+            Assertions.assertEquals("Description should not be empty!!!", result.getBody());
+        } catch (HttpClientErrorException e) {
+            Assertions.assertEquals(HttpStatus.BAD_REQUEST, e.getStatusCode());
+            Assertions.assertEquals("Description should not be empty!!!", e.getResponseBodyAsString());
+        }
+    }
+    @Test
+    public void testPostCreateTodoItemInvalidDate() throws URISyntaxException {
+        final String baseUrl = "http://localhost:"+port+"/v1/api/todo-items/create-todo-item";
+        URI uri = new URI(baseUrl);
+
+        RestTemplate restTemplate = new RestTemplate();
+        String requestJson = "{\n" +
+                "  \"description\": \" HI Task 2\",\n" +
+                "  \"dueDateTime\": \"\"\n" + // update date to a future date
+                "}";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<String> toDoItemEntity = new HttpEntity<String>(requestJson,headers);
+
+        try {
+            ResponseEntity<String> result = restTemplate.postForEntity(uri, toDoItemEntity, String.class);
+            Assertions.assertEquals("Due date time should not be empty!!!", result.getBody());
+        } catch (HttpClientErrorException e) {
+            Assertions.assertEquals(HttpStatus.BAD_REQUEST, e.getStatusCode());
+            Assertions.assertEquals("Due date time should not be empty!!!", e.getResponseBodyAsString());
+        }
     }
 
     @Test

@@ -56,14 +56,14 @@ public class TodoTaskItemService {
     public void updateItemStatusAsDone(Long id) {
         try {
             todoItemRepository.findById(id).ifPresent(toDoItem -> {
-                        if (toDoItem.getStatus() != TodoItemStatus.PAST_DUE) {
+                        if (toDoItem.getStatus() != TodoItemStatus.DONE) {
                             toDoItem.setStatus(TodoItemStatus.DONE);
                             toDoItem.setDoneDateTime(LocalDateTime.now());
                             todoItemRepository.save(toDoItem);
                             logger.info("Updated the Item status to done");
 
                         } else {
-                            throw new RuntimeException("Cannot Update Todos with Status Past Due");
+                            throw new RuntimeException("Cannot Update Todos with Status Past Due or Done");
                         }
                     }
             );
@@ -97,6 +97,17 @@ public class TodoTaskItemService {
         }
 
     }
+
+    public List<TodoTaskItems> getAllPastDue(Long id , TodoItemStatus status) {
+        try {
+            logger.info("fetched all the item where the status is not past due");
+            return todoItemRepository.findByIdAndStatusNot(id , status);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
 
     public TodoTaskItems findById(Long id) {
         Optional<TodoTaskItems> toDoItemoptional = todoItemRepository.findById(id);
